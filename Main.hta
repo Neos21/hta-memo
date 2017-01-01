@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <hta:application applicationname="Neo's Memo" singleinstance="yes" showintaskbar="no" caption="no" border="none" innerborder="no" navigable="yes">
+	<title>Neo's Memo</title>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<style>
+
+html,
+body {
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+body {
+  padding:10px;
+}
+
+#text {
+  height:141px;
+  margin-bottom:6px;
+  font-family:"MeiryoKe_Gothic", "MS Gothic", monospace;
+  background:#fcfcfc;
+  overflow-y:scroll;
+}
+
+#msg {
+  display:inline-block;
+  margin-left:2rem;
+}
+
+	</style>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script>
+
+/** File Location */
+var FILE = location.href.replace("file:///", "").replace(location.href.split("/").pop(), "Memo_" + getDate() + ".md");
+
+/** Indent : 2 Spaces */
+var INDENT = "  ";
+
+$(function () {
+  setWindow();
+  loadText();
+  
+  $("#save").on("click", saveText);
+  $(window).on("keydown", function(e) {
+    // Ctrl + S
+	// http://stackoverflow.com/questions/93695/best-cross-browser-method-to-capture-ctrls-with-jquery
+	if(e.ctrlKey && (e.keyCode === 115 || e.keyCode === 83)) {
+	  saveText();
+	}
+  });
+  
+  var textarea = document.getElementById("text");
+  $("#text").on("keydown", function(e) {
+    if(e.keyCode === 9) {
+	  e.preventDefault();
+	  var start = textarea.selectionStart;
+	  var end   = textarea.selectionEnd;
+	  var before = textarea.value.substring(0, start);
+	  var after  = textarea.value.substring(end, textarea.value.length);
+	  textarea.value = before + INDENT + after;
+	  textarea.selectionStart = textarea.selectionEnd = end + INDENT.length - (end - start);
+	}
+  });
+});
+
+function setWindow() {
+  if(location.search === "") {
+    // Default Mode
+	
+	// Position Center
+	var width  = 750;
+	var height = 200 + 40;  // Includes height of title-bar
+	window.resizeTo(width, height);
+    window.moveTo((screen.availWidth - width) / 2, (screen.availHeight - height) / 2);
+  }
+  else if(~location.search.indexOf("noborder")) {
+    // No Border Mode
+	
+	// Draggable Window
+	// http://write-off.cside.com/scripts/hta/movewin.htm
+	var drag = false, posX, posY;
+	$("#control")
+	  .on("mousedown", function(e) { drag = true; posX = e.clientX; posY = e.clientY; })
+	  .on("mousemove", function(e) { if(drag) { window.moveTo(e.screenX - posX, e.screenY - posY); } })
+	  .on("mouseup"  , function()  { drag = false; });
+  }
+}
+
+function loadText() {
+  var fso = new ActiveXObject("Scripting.FileSystemObject");
+  var file;
+  var msg = "";
+  
+  try {
+    file = fso.OpenTextFile(FILE, 1, false, false);
+	//                            |  |      |
+	//                            |  |      +-- Tristate False : Open the file as ASCII.
+	//                            |  +--------- Create False   : Do not create new file.
+	//                            +------------ For Reading    : Open a file for reading only.
+	msg += "File Opened, ";
+  }
+  catch(e) {
+    file = fso.CreateTextFile(FILE, false, false);
+	//                              |      |
+	//                              |      +-- Format ASCII    : Create an ASCII file.
+	//                              +--------- Overwrite False : Do not permit overwriting of existing file.
+	msg += "File Created, ";
+  }
+  
+  if(fso.GetFile(FILE).Size > 0) {
+    try {
+	  var data = file.ReadAll();
+	  $("#text").val(data);
+	  msg += "Text Loaded."
+	}
+	catch(e) {
+	  msg += "Load Error (" + e + ").";
+	}
+  }
+  else {
+    msg += "0 Byte File."
+  }
+  
+  $("#msg").text(msg + " ... " + getDateTime());
+  
+  file.Close();
+  file = null;
+  fso = null;
+}
+
+function saveText() {
+  var fso = new ActiveXObject("Scripting.FileSystemObject");
+  var file;
+  
+  try {
+    file = fso.OpenTextFile(FILE, 2, false, false);
+	//                            |  |      |
+	//                            |  |      +-- Tristate False : Open the file as ASCII.
+	//                            |  +--------- Create False   : Do not create new file.
+	//                            +------------ For Writing    : Open a file for writing.
+  }
+  catch(e) {
+    $("#msg").text("File Open Error (" + e + "). ... " + getDateTime());
+	return;
+  }
+  
+  var msg = "";
+  var data = $("#text").val();
+  
+  try {
+    file.Write(data);
+	msg += "File Saved.";
+  }
+  catch(e) {
+    msg += "Save Error (" + e + ")";
+  }
+  
+  $("#msg").text(msg + " ... " + getDateTime());
+  
+  file.Close();
+  file = null;
+  fso = null;
+}
+
+function getDate() {
+  var d = new Date();
+  return d.getFullYear()
+         + "-" + ("0" + (d.getMonth() + 1)).slice(-2)
+		 + "-" + ("0" + d.getDate()).slice(-2);
+}
+
+function getDateTime() {
+  var d = new Date();
+  return d.getFullYear()
+         + "-" + ("0" + (d.getMonth() + 1)).slice(-2)
+		 + "-" + ("0" + d.getDate()).slice(-2)
+		 + " " + ("0" + d.getHours()).slice(-2)
+		 + ":" + ("0" + d.getMinutes()).slice(-2)
+		 + ":" + ("0" + d.getSeconds()).slice(-2);
+}
+
+    </script>
+  </head>
+  <body>
+
+<div id="wrapper">
+  <textarea id="text" class="form-control"></textarea>
+  <div id="control">
+    <input id="save" class="btn btn-info" type="button" value="Save">
+    <span id="msg" class="text-muted"></span>
+  </div>
+</div>
+
+  </body>
+</html>
