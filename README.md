@@ -29,8 +29,8 @@ Windows の HTA (HTML Application) を利用してメモアプリを作りした
 ## Links
 
 - [Neo's World](http://neo.s21.xrea.com/)
-- [Corredor](http://neos21.hatenablog.com/)
-- [Murga](http://neos21.hatenablog.jp/)
-- [El Mylar](http://neos21.hateblo.jp/)
+- [Corredor](https://neos21.hatenablog.com/)
+- [Murga](https://neos21.hatenablog.jp/)
+- [El Mylar](https://neos21.hateblo.jp/)
 - [Neo's GitHub Pages](https://neos21.github.io/)
 - [GitHub - Neos21](https://github.com/Neos21/)
