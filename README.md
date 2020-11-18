@@ -21,16 +21,6 @@ Windows の HTA (HTML Application) を利用してメモアプリを作りした
 - テキストエリアで `Tab` キーを押下すると、インデント用に半角スペース2つを入力します。
 
 
-## Author
-
-[Neo](http://neo.s21.xrea.com/)
-
-
 ## Links
 
-- [Neo's World](http://neo.s21.xrea.com/)
-- [Corredor](https://neos21.hatenablog.com/)
-- [Murga](https://neos21.hatenablog.jp/)
-- [El Mylar](https://neos21.hateblo.jp/)
-- [Neo's GitHub Pages](https://neos21.github.io/)
-- [GitHub - Neos21](https://github.com/Neos21/)
+- [Neo's World](https://neos21.net/)
